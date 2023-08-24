@@ -2,20 +2,19 @@ import '../assets/css/General.css'
 import '../assets/css/Companies.css'
 import CompaniesTable from '../components/CompaniesTable'
 import AddFloatBtn from '../components/AddFloatBtn'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import UpdateOrAddModal from '../components/UpdateOrAddModal'
+import { updateCompany } from '../utils/api/Company'
+import { FormInstance } from 'antd'
 
 const Companies = () => {
   const [open, setOpen] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)
-  const [record, setRecord] = useState({})
-
+  const [record, setRecord] = useState<any>({})
+  const formRef = useRef<FormInstance<any>>(null)
   const handleOk = () => {
-    setConfirmLoading(true)
-    setTimeout(() => {
-      setOpen(false)
-      setConfirmLoading(false)
-    }, 2000)
+    formRef.current?.submit()
+  
   }
 
   const handleCancel = () => {
@@ -23,8 +22,8 @@ const Companies = () => {
   }
 
   const showModal = (data?: any) => {
-    setOpen(true);
-    data ? setRecord(data): setRecord({})
+    setOpen(true)
+    data ? setRecord(data) : setRecord({})
   }
 
   return (
@@ -32,6 +31,10 @@ const Companies = () => {
       <CompaniesTable showModal={showModal} />
       <AddFloatBtn showModal={showModal} />
       <UpdateOrAddModal
+      setConfirmLoading={setConfirmLoading}
+      setOpen={setOpen}
+      formRef={formRef}
+      type={"company"}
         record={record}
         open={open}
         confirmLoading={confirmLoading}

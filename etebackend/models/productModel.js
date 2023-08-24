@@ -13,7 +13,7 @@ const productSchema = mongoose.Schema({
         type: Number,
         required: [true, "Please add the product amount"]
     },
-    amountunit: {
+    amountUnit: {
         type: Number,
         required: [true, "Please add the amount unit"]
     },

@@ -2,6 +2,8 @@ import { Space, Table } from 'antd'
 import EditIcon from '../assets/icons/editicon.svg'
 import DeleteIcon from '../assets/icons/deleteicon.svg'
 import { ColumnsType } from 'antd/es/table'
+import { useEffect, useState } from 'react'
+import { deleteCompany, getallCompanies } from '../utils/api/Company'
 
 const CompaniesTable = ({ showModal }: { showModal: (data: any) => void }) => {
   interface DataType {
@@ -11,6 +13,27 @@ const CompaniesTable = ({ showModal }: { showModal: (data: any) => void }) => {
     website: string
     incorporationCountry: string
   }
+
+  const [data, setData] = useState<DataType[]>([])
+
+  const deleteCompanyItem = (id: any) => {
+    deleteCompany(String(id))
+  }
+
+  useEffect(() => {
+    getallCompanies().then((res) => {
+     let organized =  res.data.map((item: any, i: number) => {
+        return {
+          key: item?._id,
+          companyName: item.companyName,
+          companyLegalNumber: item.companyLegalNumber,
+          website: item.website,
+          incorporationCountry: item.incorporationCountry,
+        }
+      })
+      setData(organized)
+    })
+  }, [showModal, deleteCompanyItem])
 
   const Columns: ColumnsType<DataType> = [
     {
@@ -47,6 +70,7 @@ const CompaniesTable = ({ showModal }: { showModal: (data: any) => void }) => {
             width={20}
           />
           <img
+          onClick={() => deleteCompanyItem(record.key)}
             src={DeleteIcon}
             alt="deleteicon"
             className="cursor-pointer"
@@ -57,55 +81,6 @@ const CompaniesTable = ({ showModal }: { showModal: (data: any) => void }) => {
     },
   ]
 
-  const data: DataType[] = [
-    {
-      key: '1',
-      companyName: 'John',
-      companyLegalNumber: 32,
-      website: 'website.com',
-      incorporationCountry: 'New York No. 1 Lake Park',
-    },
-    {
-      key: '2',
-      companyName: 'Jim',
-      companyLegalNumber: 44,
-      website: 'website.com',
-      incorporationCountry: 'London No. 1 Lake Park',
-    },
-    {
-      key: '3',
-      companyName: 'Joe',
-      companyLegalNumber: 32,
-      website: 'website.com',
-      incorporationCountry: 'Sydney No. 1 Lake Park',
-    },
-  ]
-
-  return (
-    <Table dataSource={data} columns={Columns}>
-      {/* <Column title="Company Name" dataIndex="companyName" key="companyName" />
-      <Column
-        title="Company Legal Number"
-        dataIndex="companyLegalNumber"
-        key="companyLegalNumber"
-      />
-      <Column
-        title="Incorporation Company"
-        dataIndex="incorporationCompany"
-        key="incorporationCompany"
-      />
-      <Column title="Website" dataIndex="website" key="website" />
-      <Column
-        title="Action"
-        key="action"
-        render={(_: any, record: DataType) => (
-          <Space size="middle">
-              <img onClick={showModal} src={EditIcon} alt="editicon" className='cursor-pointer' width={20} />
-              <img src={DeleteIcon} alt="deleteicon" className='cursor-pointer' width={20} />
-          </Space>
-        )}
-      /> */}
-    </Table>
-  )
+  return <Table dataSource={data} columns={Columns} />
 }
 export default CompaniesTable

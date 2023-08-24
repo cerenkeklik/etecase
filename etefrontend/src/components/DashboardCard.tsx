@@ -1,11 +1,9 @@
 import { Card } from 'antd'
 
-const DashboardCard = () => {
+const DashboardCard = ({CardContent}: {CardContent: any}) => {
   return (
-    <Card style={{ width: 300 }}>
-      <p>Card content</p>
-      <p>Card content</p>
-      <p>Card content</p>
+    <Card style={{ width: 300, height: 200 }}>
+      <CardContent />
     </Card>
   )
 }

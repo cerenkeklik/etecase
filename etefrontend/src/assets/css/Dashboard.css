@@ -1,4 +1,7 @@
 .dashboard-container{
     min-height: 100%;
     padding: 50px;
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
 }

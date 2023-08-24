@@ -1,9 +1,11 @@
 import { Space, Table } from 'antd'
-import Column from 'antd/es/table/Column'
-import EditIcon from "../assets/icons/editicon.svg";
-import DeleteIcon from "../assets/icons/deleteicon.svg";
+import EditIcon from '../assets/icons/editicon.svg'
+import DeleteIcon from '../assets/icons/deleteicon.svg'
+import { ColumnsType } from 'antd/es/table'
+import { useEffect, useState } from 'react'
+import { deleteProduct, getallProducts } from '../utils/api/Product'
 
-const ProductsTable = () => {
+const ProductsTable = ({ showModal }: { showModal: (data: any) => void }) => {
   interface DataType {
     key: React.Key
     productName: string
@@ -13,59 +15,78 @@ const ProductsTable = () => {
     company: string
   }
 
-  const data: DataType[] = [
+  const [data, setData] = useState<DataType[]>([])
+
+  const deleteProductItem = (id: any) => {
+    deleteProduct(String(id))
+  }
+
+  useEffect(() => {
+    getallProducts().then((res) => {
+      let organized = res.data.map((item: any, i: number) => {
+        return {
+          key: item._id,
+          productName: item.productName,
+          productCategory: item.productCategory,
+          productAmount: item.productAmount,
+          amountUnit: item.amountUnit,
+          company: item.company,
+        }
+      })
+      setData(organized)
+    })
+  }, [showModal, deleteProductItem])
+
+  const Columns: ColumnsType<DataType> = [
     {
-      key: '1',
-      productName: 'John',
-      productCategory: 'Category1',
-      productAmount: 32,
-      amountUnit: 1,
-      company: 'Company 1',
+      title: 'Product Name',
+      dataIndex: 'productName',
+      sorter: (a, b) => a.productName.localeCompare(b.productName),
     },
     {
-      key: '2',
-      productName: 'Jim',
-      productCategory: 'Category1',
-      productAmount: 44,
-      amountUnit: 1,
-      company: 'Company 1',
+      title: 'Product Category',
+      dataIndex: 'productCategory',
+      sorter: (a, b) => a.productCategory.localeCompare(b.productCategory),
     },
     {
-      key: '3',
-      productName: 'Joe',
-      productCategory: 'Category1',
-      productAmount: 32,
-      amountUnit: 1,
-      company: 'Company 1',
+      title: 'Product Amount',
+      dataIndex: 'productAmount',
+      sorter: (a, b) => a.productAmount - b.productAmount,
+    },
+    {
+      title: 'Amount Unit',
+      dataIndex: 'amountUnit',
+      sorter: (a, b) => a.amountUnit - b.amountUnit,
+    },
+    {
+      title: 'Company',
+      dataIndex: 'company',
+      sorter: (a, b) => a.company.localeCompare(b.company),
+    },
+    {
+      title: '',
+      key: 'operation',
+      render: (record: DataType) => (
+        <Space size="middle">
+          <img
+            onClick={() => showModal(record)}
+            src={EditIcon}
+            alt="editicon"
+            className="cursor-pointer"
+            width={20}
+          />
+          <img
+          onClick={() => deleteProductItem(record.key)}
+            src={DeleteIcon}
+            alt="deleteicon"
+            className="cursor-pointer"
+            width={20}
+          />
+        </Space>
+      ),
     },
   ]
 
-  return (
-    <Table dataSource={data}>
-      <Column title="Product Name" dataIndex="productName" key="productName" />
-      <Column
-        title="Product Category"
-        dataIndex="productCategory"
-        key="productCategory"
-      />
-      <Column
-        title="Product Amount"
-        dataIndex="productAmount"
-        key="productAmount"
-      />
-      <Column title="Amount Unit" dataIndex="amountUnit" key="amountUnit" />
-      <Column title="Company" dataIndex="company" key="company" />
-      <Column
-        title="Action"
-        key="action"
-        render={(_: any, record: DataType) => (
-          <Space size="middle">
-            <a><img src={EditIcon} alt='editicon' width={20}/></a>
-            <a><img src={DeleteIcon} alt='deleteicon' width={20}/></a>
-          </Space>
-        )}
-      />
-    </Table>
-  )
+  return <Table dataSource={data} columns={Columns} />
 }
 export default ProductsTable
